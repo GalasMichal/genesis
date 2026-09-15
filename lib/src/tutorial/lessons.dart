@@ -180,6 +180,46 @@ abstract final class BeginnerLessons {
       practiceHint:
           'Spiele Em–Am–D–Em mindestens zwei Minuten. Fertig? Lektion abhaken und kurz feiern.',
     ),
+    Lesson(
+      id: 'schlagtechnik-handgelenk',
+      title: 'Schlagtechnik: locker aus dem Handgelenk',
+      summary:
+          'Saubere Schläge kommen aus dem Handgelenk, nicht aus dem ganzen Arm. '
+          'Hier übst du den 4/4-Grundschlag und das Muster mit Pause — '
+          'ruhig, gleichmäßig, ohne Kraftaufwand.',
+      steps: [
+        'Lass den Unterarm ruhig: nur das Handgelenk kippt nach unten und oben.',
+        'Zähle „1 und 2 und 3 und 4 und“ — jeder Zählzeit entspricht ein Achtel.',
+        'Spiele den Grundschlag ↓ ↓↑ ↓↑ auf Em: Abschlag auf 1, dann ↓↑ auf 2 und 3.',
+        'Wechsle zum Muster mit Pause: die kurzen Lücken bewusst stehen lassen.',
+        'Wenn die Schulter mitzieht: Tempo halbieren und nur Abschläge auf 1 und 3.',
+      ],
+      chord: BeginnerChords.em,
+      techniquePatternId: 'grundschlag-44',
+      practiceHint:
+          'Zwei Minuten Grundschlag auf Em, dann eine Minute „mit Pause“. '
+          'Ziel: gleichmäßiger Puls ohne verspannte Schulter.',
+    ),
+    Lesson(
+      id: 'zupfen-daumen-finger',
+      title: 'Zupfen: Daumen und Finger',
+      summary:
+          'Beim Fingerpicking hat jeder Finger eine Aufgabe: p (Daumen) den Bass, '
+          'i/m/a die höheren Saiten. Du lernst die Buchstaben und dein erstes '
+          'Arpeggio p–i–m–a.',
+      steps: [
+        'Merke: p = Daumen, i = Zeigefinger, m = Mittelfinger, a = Ringfinger.',
+        'Setze den Daumen leicht auf eine Bass-Saite (z. B. d = Saite 4).',
+        'Zeigefinger auf g (3), Mittelfinger auf h (2), Ringfinger auf hohe e (1).',
+        'Zupfe langsam p–i–m–a, ohne die Hand vom Hals zu reißen — Finger rollen.',
+        'Halte Em und wiederhole das Arpeggio im ruhigen Vierer-Puls.',
+      ],
+      chord: BeginnerChords.em,
+      techniquePatternId: 'arpeggio-pima',
+      practiceHint:
+          'Eine Minute nur p–i–m–a auf Em. Danach denselben Ablauf auf Am — '
+          'Bass-Saite bleibt die, die zum Griff passt.',
+    ),
   ];
 
   static Lesson? byId(String id) {

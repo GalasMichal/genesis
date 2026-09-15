@@ -1,6 +1,9 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import '../src/fretboard/fretboard_widget.dart';
+import '../src/strumming/technique_display.dart';
 import '../src/tutorial/lesson.dart';
 import '../src/tutorial/lesson_progress.dart';
 
@@ -27,11 +30,21 @@ class _LessonDetailScreenState extends State<LessonDetailScreen> {
   late bool _completed;
   bool _leftHanded = false;
   bool _saving = false;
+  bool _patternPlaying = false;
+  double _patternBeat = 0;
+  Timer? _patternTicker;
+  static const _patternBpm = 72.0;
 
   @override
   void initState() {
     super.initState();
     _completed = widget.initialCompleted;
+  }
+
+  @override
+  void dispose() {
+    _patternTicker?.cancel();
+    super.dispose();
   }
 
   Future<void> _toggleCompleted() async {
@@ -43,6 +56,26 @@ class _LessonDetailScreenState extends State<LessonDetailScreen> {
     setState(() {
       _completed = next;
       _saving = false;
+    });
+  }
+
+  void _togglePatternPlay() {
+    if (_patternPlaying) {
+      _patternTicker?.cancel();
+      _patternTicker = null;
+      setState(() => _patternPlaying = false);
+      return;
+    }
+    setState(() => _patternPlaying = true);
+    var last = DateTime.now();
+    _patternTicker = Timer.periodic(const Duration(milliseconds: 32), (_) {
+      final now = DateTime.now();
+      final dt = now.difference(last).inMicroseconds / 1e6;
+      last = now;
+      if (!mounted) return;
+      setState(() {
+        _patternBeat += dt * (_patternBpm / 60.0);
+      });
     });
   }
 
@@ -89,6 +122,32 @@ class _LessonDetailScreenState extends State<LessonDetailScreen> {
                 chord: lesson.chord!,
                 leftHanded: _leftHanded,
                 onLeftHandedChanged: (v) => setState(() => _leftHanded = v),
+              ),
+            ],
+            if (lesson.techniquePatternId != null) ...[
+              const SizedBox(height: 28),
+              Text(
+                'Muster zum Mitüben',
+                style: theme.textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const SizedBox(height: 12),
+              TechniqueDisplay(
+                patternId: lesson.techniquePatternId!,
+                beat: _patternBeat,
+              ),
+              const SizedBox(height: 12),
+              FilledButton.tonalIcon(
+                onPressed: _togglePatternPlay,
+                icon: Icon(
+                  _patternPlaying ? Icons.pause : Icons.play_arrow,
+                ),
+                label: Text(
+                  _patternPlaying
+                      ? 'Pause (${_patternBpm.round()} BPM)'
+                      : 'Muster starten (${_patternBpm.round()} BPM)',
+                ),
               ),
             ],
             if (lesson.practiceHint != null) ...[

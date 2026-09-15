@@ -46,6 +46,7 @@ class SongSection {
 /// ```
 /// Song
 ///   id, title, category, difficulty (1–5), bpm (Standard-Tempo)
+///   patternId: ID aus PatternCatalog (Schlag- oder Zupfmuster)
 ///   source: { kind: eigen|gemeinfrei, note: "…" }
 ///   sections[]: optional { id, label, startBeat, endBeat }
 ///   events[]: { beat, chordId }
@@ -53,6 +54,7 @@ class SongSection {
 ///
 /// - **beat**: Position in Beats ab 0. Muss **streng monoton steigen**.
 /// - **chordId**: ID aus [BeginnerChords] (z. B. `em`, `c`, `g`).
+/// - **patternId**: Pflicht — verweist auf ein Technik-Muster.
 /// - **bpm**: Standard-Tempo in Viertel/Minute; Play-Along skaliert 50–100 %.
 /// - Dauer eines Events = bis zum nächsten Event bzw. Songende
 ///   (`events.last.beat + defaultHoldBeats`).
@@ -81,6 +83,7 @@ class Song {
     required this.bpm,
     required this.source,
     required this.events,
+    required this.patternId,
     this.summary = '',
     this.sections = const [],
     this.defaultHoldBeats = 4,
@@ -100,6 +103,9 @@ class Song {
   final String summary;
   final List<SongEvent> events;
   final List<SongSection> sections;
+
+  /// ID eines Schlag- oder Zupfmusters aus [PatternCatalog].
+  final String patternId;
 
   /// Beats, die der letzte Akkord gehalten wird.
   final double defaultHoldBeats;

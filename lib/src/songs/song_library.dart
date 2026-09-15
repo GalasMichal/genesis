@@ -59,6 +59,7 @@ abstract final class SongLibrary {
     category: SongCategory.beginnerExercises,
     difficulty: 1,
     bpm: 70,
+    patternId: 'grundschlag-44',
     summary: 'Zwei Takte Em, zwei Takte Am — ruhiger Wechsel ohne Hektik.',
     source: SongSource(
       kind: SongSourceKind.original,
@@ -82,6 +83,7 @@ abstract final class SongLibrary {
     category: SongCategory.beginnerExercises,
     difficulty: 2,
     bpm: 72,
+    patternId: 'grundschlag-44',
     summary: 'Klassischer C↔G-Wechsel — Grundlage vieler Lieder.',
     source: SongSource(
       kind: SongSourceKind.original,
@@ -117,6 +119,7 @@ abstract final class SongLibrary {
     category: SongCategory.beginnerExercises,
     difficulty: 2,
     bpm: 76,
+    patternId: 'mit-pause-44',
     summary: 'Drei offene Akkorde im ruhigen Wechsel — Einstieg in G-Dur.',
     source: SongSource(
       kind: SongSourceKind.original,
@@ -144,6 +147,7 @@ abstract final class SongLibrary {
     category: SongCategory.englishTraditionals,
     difficulty: 2,
     bpm: 72,
+    patternId: 'ballade-44',
     summary: 'Hymne in G-Dur — G, C und D im ruhigen 4/4.',
     source: SongSource(
       kind: SongSourceKind.publicDomain,
@@ -173,6 +177,7 @@ abstract final class SongLibrary {
     category: SongCategory.englishTraditionals,
     difficulty: 3,
     bpm: 84,
+    patternId: 'arpeggio-pima',
     summary:
         'Amerikanisches Traditional — Am–C–D–E7 (eigenes Anfänger-Arrangement).',
     source: SongSource(
@@ -204,6 +209,7 @@ abstract final class SongLibrary {
     category: SongCategory.englishTraditionals,
     difficulty: 2,
     bpm: 100,
+    patternId: 'grundschlag-44',
     summary: 'Stephen Foster — fröhliches C–G–G7-Strumming.',
     source: SongSource(
       kind: SongSourceKind.publicDomain,
@@ -233,6 +239,7 @@ abstract final class SongLibrary {
     category: SongCategory.englishTraditionals,
     difficulty: 3,
     bpm: 78,
+    patternId: 'travis-einfach',
     summary: 'Englische Ballade — Am und Em im modalen Wechsel.',
     source: SongSource(
       kind: SongSourceKind.publicDomain,
@@ -265,6 +272,7 @@ abstract final class SongLibrary {
     category: SongCategory.polishFolk,
     difficulty: 1,
     bpm: 96,
+    patternId: 'walzer-34',
     summary: 'Polnisches Geburtstagslied — G, C und D, sehr zugänglich.',
     source: SongSource(
       kind: SongSourceKind.publicDomain,
@@ -295,6 +303,7 @@ abstract final class SongLibrary {
     category: SongCategory.polishFolk,
     difficulty: 1,
     bpm: 88,
+    patternId: 'mit-pause-44',
     summary: 'Polnisches Kinderlied — C und G im ruhigen Wechsel.',
     source: SongSource(
       kind: SongSourceKind.publicDomain,
@@ -324,6 +333,7 @@ abstract final class SongLibrary {
     category: SongCategory.polishFolk,
     difficulty: 2,
     bpm: 92,
+    patternId: 'grundschlag-44',
     summary: 'Polnisches Volkslied — G–D–Em–C im flüssigen Strumming.',
     source: SongSource(
       kind: SongSourceKind.publicDomain,
@@ -355,6 +365,7 @@ abstract final class SongLibrary {
     category: SongCategory.classical,
     difficulty: 3,
     bpm: 100,
+    patternId: 'betont-44',
     summary: 'Beethovens Melodie als Anfänger-Akkordfolge (G–D–Em–C).',
     source: SongSource(
       kind: SongSourceKind.publicDomain,
@@ -387,6 +398,7 @@ abstract final class SongLibrary {
     category: SongCategory.originalPopRock,
     difficulty: 3,
     bpm: 108,
+    patternId: 'betont-44',
     summary:
         'Eigenes Pop-Strumming: C–G–Am–Em — klassischer Vier-Akkord-Drive.',
     source: SongSource(
@@ -415,6 +427,7 @@ abstract final class SongLibrary {
     category: SongCategory.originalPopRock,
     difficulty: 4,
     bpm: 116,
+    patternId: 'betont-44',
     summary: 'Eigenes Rock-Strumming: Em–C–G–D — etwas zügigeres Tempo.',
     source: SongSource(
       kind: SongSourceKind.original,
@@ -442,6 +455,7 @@ abstract final class SongLibrary {
     category: SongCategory.originalPopRock,
     difficulty: 3,
     bpm: 102,
+    patternId: 'mit-pause-44',
     summary: 'Eigenes Pop-Rock-Stück: G–D–Em–C (I–V–vi–IV) im Strumming.',
     source: SongSource(
       kind: SongSourceKind.original,

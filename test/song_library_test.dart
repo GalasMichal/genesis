@@ -77,6 +77,7 @@ void main() {
         category: SongCategory.beginnerExercises,
         difficulty: 9,
         bpm: 10,
+        patternId: '',
         source: SongSource(kind: SongSourceKind.original, note: ''),
         events: [
           SongEvent(beat: 4, chordId: 'em'),
@@ -90,6 +91,19 @@ void main() {
       expect(errors.any((e) => e.contains('monoton')), isTrue);
       expect(errors.any((e) => e.contains('unbekannter Akkord')), isTrue);
       expect(errors.any((e) => e.contains('Quellen')), isTrue);
+      expect(errors.any((e) => e.contains('Technik-Muster')), isTrue);
+    });
+
+    test('Jeder Song hat ein gültiges Technik-Muster', () {
+      for (final song in SongLibrary.all) {
+        expect(song.patternId, isNotEmpty, reason: song.id);
+        final errors = SongValidator.validate(song);
+        expect(
+          errors.where((e) => e.contains('Technik-Muster')),
+          isEmpty,
+          reason: '${song.id}: ${errors.join(", ")}',
+        );
+      }
     });
 
     test('byCategory filtert korrekt', () {

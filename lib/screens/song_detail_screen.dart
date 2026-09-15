@@ -19,6 +19,7 @@ import '../src/songs/song.dart';
 import '../src/songs/song_category.dart';
 import '../src/songs/song_library.dart';
 import '../src/songs/song_progress.dart';
+import '../src/strumming/technique_display.dart';
 import '../src/tuner/pitch_pipeline.dart';
 import 'songs_screen.dart';
 
@@ -366,6 +367,18 @@ class _SongDetailScreenState extends State<SongDetailScreen> {
                 minHeight: 4,
                 backgroundColor: cs.surfaceContainerHighest,
               ),
+            ),
+            const SizedBox(height: 24),
+            Text(
+              'Schlag- / Zupfmuster',
+              style: theme.textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(height: 10),
+            TechniqueDisplay(
+              patternId: song.patternId,
+              beat: _controller.beat,
             ),
             const SizedBox(height: 24),
             Text(

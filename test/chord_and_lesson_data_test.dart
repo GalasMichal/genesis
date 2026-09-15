@@ -46,8 +46,8 @@ void main() {
     expect(f.barre!.covers(6), isTrue);
   });
 
-  test('Tutorial hat 8–10 deutsche Lektionen mit Schritten', () {
-    expect(BeginnerLessons.all.length, inInclusiveRange(8, 10));
+  test('Tutorial hat 10–12 deutsche Lektionen mit Schritten', () {
+    expect(BeginnerLessons.all.length, inInclusiveRange(10, 12));
     for (final lesson in BeginnerLessons.all) {
       expect(lesson.title, isNotEmpty);
       expect(lesson.summary.length, greaterThan(40));
@@ -64,10 +64,24 @@ void main() {
     expect(titles.any((t) => t.contains('D')), isTrue);
     expect(titles.any((t) => t.contains('Griffwechsel')), isTrue);
     expect(titles.any((t) => t.contains('Mini-Song')), isTrue);
+    expect(titles.any((t) => t.contains('Schlagtechnik')), isTrue);
+    expect(titles.any((t) => t.contains('Zupfen')), isTrue);
 
-    // Reihenfolge: Griffwechsel vor C/G, D vor Schlagmuster
+    // Reihenfolge: Griffwechsel vor C/G, D vor Schlagmuster, Technik nach Mini-Song
     final ids = BeginnerLessons.all.map((l) => l.id).toList();
     expect(ids.indexOf('griffwechsel'), lessThan(ids.indexOf('akkord-c-g')));
     expect(ids.indexOf('akkord-d'), lessThan(ids.indexOf('schlagmuster')));
+    expect(
+      ids.indexOf('mini-song'),
+      lessThan(ids.indexOf('schlagtechnik-handgelenk')),
+    );
+    expect(
+      ids.indexOf('schlagtechnik-handgelenk'),
+      lessThan(ids.indexOf('zupfen-daumen-finger')),
+    );
+
+    final techLessons =
+        BeginnerLessons.all.where((l) => l.techniquePatternId != null);
+    expect(techLessons.length, greaterThanOrEqualTo(2));
   });
 }

@@ -10,6 +10,7 @@ class Lesson {
     this.chord,
     this.practiceHint,
     this.opensTuner = false,
+    this.techniquePatternId,
   });
 
   final String id;
@@ -29,6 +30,9 @@ class Lesson {
 
   /// Wenn true, zeigt die UI einen Sprung zum Stimmen-Tab.
   final bool opensTuner;
+
+  /// Optionales Schlag-/Zupfmuster zum Mitüben (PatternCatalog-ID).
+  final String? techniquePatternId;
 
   /// Zusammengefügter Fließtext (für Tests / Suche).
   String get body => '$summary\n\n${steps.map((s) => '• $s').join('\n')}';

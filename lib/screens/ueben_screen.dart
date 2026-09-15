@@ -4,6 +4,7 @@ import '../src/practice/practice_progress.dart';
 import '../src/practice/practice_set.dart';
 import '../src/practice/practice_sets.dart';
 import 'practice_session_screen.dart';
+import 'strumming_practice_screen.dart';
 
 /// Übersicht der Übungs-Sets mit lokalem Fortschritt.
 class UebenScreen extends StatefulWidget {
@@ -57,6 +58,14 @@ class _UebenScreenState extends State<UebenScreen> {
       ),
     );
     await _reload();
+  }
+
+  Future<void> _openStrummingPractice() async {
+    await Navigator.of(context).push<void>(
+      MaterialPageRoute(
+        builder: (_) => const StrummingPracticeScreen(),
+      ),
+    );
   }
 
   @override
@@ -124,8 +133,87 @@ class _UebenScreenState extends State<UebenScreen> {
                         onTap: () => _openSet(sets[i]),
                       ),
                     ],
+                  const SizedBox(height: 32),
+                  Text(
+                    'Rhythmus',
+                    style: theme.textTheme.headlineSmall?.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Schlag- und Zupfmuster im Tempo mitspielen — '
+                    'visuell geführt, ohne Mikrofon.',
+                    style: theme.textTheme.bodyLarge?.copyWith(
+                      height: 1.45,
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  _StrummingPracticeTile(onTap: _openStrummingPractice),
                 ],
               ),
+      ),
+    );
+  }
+}
+
+class _StrummingPracticeTile extends StatelessWidget {
+  const _StrummingPracticeTile({required this.onTap});
+
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Material(
+      color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.45),
+      borderRadius: BorderRadius.circular(12),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(12),
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(minHeight: 72),
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(16, 14, 12, 14),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.graphic_eq,
+                  size: 28,
+                  color: theme.colorScheme.primary,
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Schlagmuster üben',
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        'Grundschlag, Pause, Walzer, Arpeggio & Travis — '
+                        'mit Tempo-Regler.',
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          height: 1.35,
+                          color: theme.colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Icon(
+                  Icons.chevron_right,
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }

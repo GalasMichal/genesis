@@ -1,4 +1,5 @@
 import '../chords/beginner_chords.dart';
+import '../strumming/pattern_validator.dart';
 import 'song.dart';
 
 /// Validiert Genesis-Song-Datensätze (Format + inhaltliche Plausibilität).
@@ -19,6 +20,9 @@ abstract final class SongValidator {
     if (song.title.trim().isEmpty) {
       errors.add('$prefix: Titel fehlt');
     }
+    errors.addAll(
+      PatternValidator.validatePatternId(song.patternId, songId: prefix),
+    );
     if (song.difficulty < minDifficulty || song.difficulty > maxDifficulty) {
       errors.add(
         '$prefix: Schwierigkeit ${song.difficulty} außerhalb '

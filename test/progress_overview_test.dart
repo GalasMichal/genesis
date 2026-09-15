@@ -4,6 +4,7 @@ import 'package:genesis/screens/lernen_screen.dart';
 import 'package:genesis/src/practice/practice_progress.dart';
 import 'package:genesis/src/songs/song_progress.dart';
 import 'package:genesis/src/tutorial/lesson_progress.dart';
+import 'package:genesis/src/tutorial/lessons.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
@@ -34,7 +35,10 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Dein Fortschritt'), findsOneWidget);
-    expect(find.textContaining('2/10 abgeschlossen'), findsOneWidget);
+    expect(
+      find.textContaining('2/${BeginnerLessons.all.length} abgeschlossen'),
+      findsOneWidget,
+    );
     expect(find.textContaining('2/7 mit Fortschritt'), findsOneWidget);
     expect(find.textContaining('gespielt'), findsOneWidget);
   });

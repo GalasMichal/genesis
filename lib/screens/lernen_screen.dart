@@ -137,8 +137,8 @@ class _LernenScreenState extends State<LernenScreen> {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Von Haltung und Stimmen bis zu den ersten Akkorden und '
-                    'einem einfachen Schlagmuster — Schritt für Schritt.',
+                    'Von Haltung und Stimmen bis zu Schlagtechnik und Zupfen — '
+                    'Schritt für Schritt.',
                     style: theme.textTheme.bodyLarge?.copyWith(
                       height: 1.45,
                       color: theme.colorScheme.onSurfaceVariant,
