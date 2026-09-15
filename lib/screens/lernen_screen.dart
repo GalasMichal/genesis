@@ -2,19 +2,27 @@ import 'package:flutter/material.dart';
 
 import '../src/chords/beginner_chords.dart';
 import '../src/fretboard/fretboard_widget.dart';
+import '../src/practice/practice_progress.dart';
+import '../src/practice/practice_sets.dart';
+import '../src/songs/song_library.dart';
+import '../src/songs/song_progress.dart';
 import '../src/tutorial/lesson_progress.dart';
 import '../src/tutorial/lessons.dart';
 import 'lesson_detail_screen.dart';
 
-/// Tutorial-Pfad: Lektionsliste, Fortschrittsbalken, Griffbrett-Vorschau.
+/// Tutorial-Pfad: Fortschrittskarte, Lektionsliste, Griffbrett-Vorschau.
 class LernenScreen extends StatefulWidget {
   const LernenScreen({
     super.key,
     this.progress,
+    this.practiceProgress,
+    this.songProgress,
     this.onOpenTuner,
   });
 
   final LessonProgressStore? progress;
+  final PracticeProgressStore? practiceProgress;
+  final SongProgressStore? songProgress;
   final VoidCallback? onOpenTuner;
 
   @override
@@ -23,7 +31,13 @@ class LernenScreen extends StatefulWidget {
 
 class _LernenScreenState extends State<LernenScreen> {
   late final LessonProgressStore _progress;
+  late final PracticeProgressStore _practiceProgress;
+  late final SongProgressStore _songProgress;
   Set<String> _done = {};
+  int _practiceDone = 0;
+  int _practiceTotal = 0;
+  int _songsPlayed = 0;
+  int _songsTotal = 0;
   bool _loading = true;
   bool _leftHanded = false;
   int _previewIndex = 0;
@@ -40,15 +54,33 @@ class _LernenScreenState extends State<LernenScreen> {
   void initState() {
     super.initState();
     _progress = widget.progress ?? LessonProgressStore();
+    _practiceProgress = widget.practiceProgress ?? PracticeProgressStore();
+    _songProgress = widget.songProgress ?? SongProgressStore();
     _reload();
   }
 
   Future<void> _reload() async {
-    final ids = BeginnerLessons.all.map((l) => l.id);
-    final done = await _progress.completedIds(ids);
+    final lessonIds = BeginnerLessons.all.map((l) => l.id);
+    final done = await _progress.completedIds(lessonIds);
+
+    final practiceIds = BeginnerPracticeSets.all.map((s) => s.id).toList();
+    var practiceWithProgress = 0;
+    for (final id in practiceIds) {
+      final done = await _practiceProgress.isCompleted(id);
+      final best = await _practiceProgress.bestStep(id);
+      if (done || best > 0) practiceWithProgress++;
+    }
+
+    final songIds = SongLibrary.all.map((s) => s.id);
+    final played = await _songProgress.playedIds(songIds);
+
     if (!mounted) return;
     setState(() {
       _done = done;
+      _practiceDone = practiceWithProgress;
+      _practiceTotal = practiceIds.length;
+      _songsPlayed = played.length;
+      _songsTotal = SongLibrary.all.length;
       _loading = false;
     });
   }
@@ -88,6 +120,15 @@ class _LernenScreenState extends State<LernenScreen> {
             : ListView(
                 padding: const EdgeInsets.fromLTRB(24, 8, 24, 32),
                 children: [
+                  _ProgressOverviewCard(
+                    lessonsDone: completed,
+                    lessonsTotal: total,
+                    practiceDone: _practiceDone,
+                    practiceTotal: _practiceTotal,
+                    songsPlayed: _songsPlayed,
+                    songsTotal: _songsTotal,
+                  ),
+                  const SizedBox(height: 28),
                   Text(
                     'Anfänger-Pfad',
                     style: theme.textTheme.headlineSmall?.copyWith(
@@ -129,7 +170,8 @@ class _LernenScreenState extends State<LernenScreen> {
                     child: LinearProgressIndicator(
                       value: fraction,
                       minHeight: 10,
-                      backgroundColor: theme.colorScheme.surfaceContainerHighest,
+                      backgroundColor:
+                          theme.colorScheme.surfaceContainerHighest,
                     ),
                   ),
                   const SizedBox(height: 28),
@@ -150,7 +192,8 @@ class _LernenScreenState extends State<LernenScreen> {
                   FretboardWidget(
                     chord: _previewChords[_previewIndex],
                     leftHanded: _leftHanded,
-                    onLeftHandedChanged: (v) => setState(() => _leftHanded = v),
+                    onLeftHandedChanged: (v) =>
+                        setState(() => _leftHanded = v),
                   ),
                   const SizedBox(height: 8),
                   Wrap(
@@ -175,17 +218,142 @@ class _LernenScreenState extends State<LernenScreen> {
                     ),
                   ),
                   const SizedBox(height: 8),
-                  for (var i = 0; i < BeginnerLessons.all.length; i++) ...[
-                    if (i > 0) const SizedBox(height: 8),
-                    _LessonTile(
-                      index: i + 1,
-                      title: BeginnerLessons.all[i].title,
-                      completed: _done.contains(BeginnerLessons.all[i].id),
-                      onTap: () => _openLesson(i),
-                    ),
-                  ],
+                  if (BeginnerLessons.all.isEmpty)
+                    const _EmptyHint(
+                      text:
+                          'Noch keine Lektionen geladen. Bitte später erneut öffnen.',
+                    )
+                  else
+                    for (var i = 0; i < BeginnerLessons.all.length; i++) ...[
+                      if (i > 0) const SizedBox(height: 8),
+                      _LessonTile(
+                        index: i + 1,
+                        title: BeginnerLessons.all[i].title,
+                        completed: _done.contains(BeginnerLessons.all[i].id),
+                        onTap: () => _openLesson(i),
+                      ),
+                    ],
                 ],
               ),
+      ),
+    );
+  }
+}
+
+/// Kompakte Übersichtskarte über Lektionen, Übungen und Songs.
+class _ProgressOverviewCard extends StatelessWidget {
+  const _ProgressOverviewCard({
+    required this.lessonsDone,
+    required this.lessonsTotal,
+    required this.practiceDone,
+    required this.practiceTotal,
+    required this.songsPlayed,
+    required this.songsTotal,
+  });
+
+  final int lessonsDone;
+  final int lessonsTotal;
+  final int practiceDone;
+  final int practiceTotal;
+  final int songsPlayed;
+  final int songsTotal;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final cs = theme.colorScheme;
+
+    return Material(
+      color: cs.surfaceContainerHighest.withValues(alpha: 0.55),
+      borderRadius: BorderRadius.circular(14),
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Dein Fortschritt',
+              style: theme.textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+            const SizedBox(height: 12),
+            _ProgressLine(
+              label: 'Lektionen',
+              value: '$lessonsDone/$lessonsTotal abgeschlossen',
+            ),
+            const SizedBox(height: 8),
+            _ProgressLine(
+              label: 'Übungs-Sets',
+              value: practiceDone == 0 && practiceTotal > 0
+                  ? 'Noch keins geschafft · $practiceTotal Sets'
+                  : '$practiceDone/$practiceTotal mit Fortschritt',
+            ),
+            const SizedBox(height: 8),
+            _ProgressLine(
+              label: 'Songs',
+              value: songsPlayed == 0
+                  ? 'Noch keinen gespielt · $songsTotal in der Bibliothek'
+                  : '$songsPlayed/$songsTotal gespielt',
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _ProgressLine extends StatelessWidget {
+  const _ProgressLine({required this.label, required this.value});
+
+  final String label;
+  final String value;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SizedBox(
+          width: 108,
+          child: Text(
+            label,
+            style: theme.textTheme.labelLarge?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+        Expanded(
+          child: Text(
+            value,
+            style: theme.textTheme.bodyMedium?.copyWith(
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _EmptyHint extends StatelessWidget {
+  const _EmptyHint({required this.text});
+
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 12),
+      child: Text(
+        text,
+        style: theme.textTheme.bodyMedium?.copyWith(
+          height: 1.4,
+          color: theme.colorScheme.onSurfaceVariant,
+        ),
       ),
     );
   }

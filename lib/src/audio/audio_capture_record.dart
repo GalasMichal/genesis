@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:typed_data';
 
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:permission_handler/permission_handler.dart';
 import 'package:record/record.dart';
 
@@ -8,6 +9,7 @@ import 'audio_capture.dart';
 
 /// Capture über das Package `record` (BSD):
 /// PCM16-Stream, autoGain/echoCancel/noiseSuppress = false.
+/// Auf Web: AudioWorklet + getUserMedia (record_web).
 class RecordAudioCapture implements AudioCaptureSource {
   RecordAudioCapture({AudioRecorder? recorder})
     : _recorder = recorder ?? AudioRecorder();
@@ -27,10 +29,18 @@ class RecordAudioCapture implements AudioCaptureSource {
 
   @override
   Future<bool> ensurePermission() async {
-    // record hat eigene Permission-API; permission_handler für Settings-Pfad.
+    // record: auf Web/nativ der korrekte getUserMedia-/Permission-Pfad.
+    try {
+      if (await _recorder.hasPermission()) return true;
+    } catch (_) {
+      // weiter mit permission_handler
+    }
+    if (kIsWeb) {
+      // Ohne Permission bleibt der Stream-Start mit deutschem Fehlerhinweis.
+      return false;
+    }
     final mic = await Permission.microphone.request();
     if (mic.isGranted) return true;
-    // Fallback: record-eigene Prüfung (manche Desktop-Targets)
     try {
       return await _recorder.hasPermission();
     } catch (_) {
@@ -40,6 +50,7 @@ class RecordAudioCapture implements AudioCaptureSource {
 
   @override
   Future<void> openSystemSettings() async {
+    if (kIsWeb) return;
     await openAppSettings();
   }
 

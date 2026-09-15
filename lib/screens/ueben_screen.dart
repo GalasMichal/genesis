@@ -63,9 +63,7 @@ class _UebenScreenState extends State<UebenScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final sets = BeginnerPracticeSets.all;
-    final fraction = sets.isEmpty
-        ? 0.0
-        : _completed.length / sets.length;
+    final fraction = sets.isEmpty ? 0.0 : _completed.length / sets.length;
 
     return Scaffold(
       appBar: AppBar(title: const Text('Üben')),
@@ -99,22 +97,33 @@ class _UebenScreenState extends State<UebenScreen> {
                   ),
                   const SizedBox(height: 8),
                   ClipRRect(
-                    borderRadius: BorderRadius.circular(4),
+                    borderRadius: BorderRadius.circular(8),
                     child: LinearProgressIndicator(
                       value: fraction,
-                      minHeight: 8,
+                      minHeight: 10,
+                      backgroundColor:
+                          theme.colorScheme.surfaceContainerHighest,
                     ),
                   ),
                   const SizedBox(height: 24),
-                  for (var i = 0; i < sets.length; i++) ...[
-                    if (i > 0) const SizedBox(height: 10),
-                    _PracticeSetTile(
-                      set: sets[i],
-                      completed: _completed.contains(sets[i].id),
-                      bestStep: _best[sets[i].id] ?? 0,
-                      onTap: () => _openSet(sets[i]),
-                    ),
-                  ],
+                  if (sets.isEmpty)
+                    Text(
+                      'Noch keine Übungs-Sets verfügbar. Schau später wieder vorbei.',
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        height: 1.4,
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                    )
+                  else
+                    for (var i = 0; i < sets.length; i++) ...[
+                      if (i > 0) const SizedBox(height: 10),
+                      _PracticeSetTile(
+                        set: sets[i],
+                        completed: _completed.contains(sets[i].id),
+                        bestStep: _best[sets[i].id] ?? 0,
+                        onTap: () => _openSet(sets[i]),
+                      ),
+                    ],
                 ],
               ),
       ),
@@ -150,52 +159,59 @@ class _PracticeSetTile extends StatelessWidget {
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(12),
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(16, 14, 12, 14),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Icon(
-                completed ? Icons.check_circle : Icons.play_circle_outline,
-                color: completed
-                    ? const Color(0xFF3DDC97)
-                    : theme.colorScheme.primary,
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      set.title,
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      set.summary,
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        height: 1.35,
-                        color: theme.colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-                    const SizedBox(height: 6),
-                    Text(
-                      stepLabel,
-                      style: theme.textTheme.labelMedium?.copyWith(
-                        color: theme.colorScheme.primary,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ],
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(minHeight: 72),
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(16, 14, 12, 14),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(top: 2),
+                  child: Icon(
+                    completed ? Icons.check_circle : Icons.play_circle_outline,
+                    size: 28,
+                    color: completed
+                        ? const Color(0xFF3DDC97)
+                        : theme.colorScheme.primary,
+                  ),
                 ),
-              ),
-              Icon(
-                Icons.chevron_right,
-                color: theme.colorScheme.onSurfaceVariant,
-              ),
-            ],
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        set.title,
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        set.summary,
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          height: 1.35,
+                          color: theme.colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        stepLabel,
+                        style: theme.textTheme.labelMedium?.copyWith(
+                          color: theme.colorScheme.primary,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Icon(
+                  Icons.chevron_right,
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+              ],
+            ),
           ),
         ),
       ),

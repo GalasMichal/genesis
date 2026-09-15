@@ -105,14 +105,11 @@ class _PracticeSessionScreenState extends State<PracticeSessionScreen>
       _statusMessage = null;
     });
 
-    if (!_capture.isSupported || kIsWeb) {
+    if (!_capture.isSupported) {
       setState(() {
         _starting = false;
         _listening = false;
-        _statusMessage = _capture.isSupported
-            ? 'Live-Mikrofon ist im Web-Build eingeschränkt. '
-                'Bitte die native App auf dem Handy nutzen.'
-            : _capture.unsupportedMessage;
+        _statusMessage = _capture.unsupportedMessage;
       });
       return;
     }
@@ -121,15 +118,20 @@ class _PracticeSessionScreenState extends State<PracticeSessionScreen>
     if (!mounted) return;
 
     if (!granted) {
-      final permanently = await Permission.microphone.isPermanentlyDenied;
+      final permanently =
+          !kIsWeb && await Permission.microphone.isPermanentlyDenied;
       setState(() {
         _starting = false;
         _permissionDenied = true;
         _statusMessage = permanently
             ? 'Mikrofon-Zugriff wurde dauerhaft verweigert. '
                 'Bitte in den Systemeinstellungen erlauben.'
-            : 'Ohne Mikrofon kann genesis deine Töne nicht prüfen. '
-                'Bitte erlaube den Zugriff, wenn du gefragt wirst.';
+            : kIsWeb
+                ? 'Mikrofon-Zugriff wurde blockiert. Bitte in den '
+                    'Browser-Einstellungen für diese Seite erlauben und '
+                    'erneut versuchen.'
+                : 'Ohne Mikrofon kann genesis deine Töne nicht prüfen. '
+                    'Bitte erlaube den Zugriff, wenn du gefragt wirst.';
       });
       return;
     }
@@ -242,7 +244,7 @@ class _PracticeSessionScreenState extends State<PracticeSessionScreen>
       appBar: AppBar(title: Text(set.title)),
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(20, 8, 20, 16),
+          padding: const EdgeInsets.fromLTRB(24, 8, 24, 16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [

@@ -18,6 +18,7 @@ import '../src/songs/play_along_controller.dart';
 import '../src/songs/song.dart';
 import '../src/songs/song_category.dart';
 import '../src/songs/song_library.dart';
+import '../src/songs/song_progress.dart';
 import '../src/tuner/pitch_pipeline.dart';
 import 'songs_screen.dart';
 
@@ -28,6 +29,7 @@ class SongDetailScreen extends StatefulWidget {
     required this.song,
     this.capture,
     this.readingStream,
+    this.songProgress,
   });
 
   final Song song;
@@ -38,12 +40,16 @@ class SongDetailScreen extends StatefulWidget {
   /// Optional fertiger Reading-Stream (Widget-Tests ohne Mic).
   final Stream<TunerReading>? readingStream;
 
+  /// Optional injizierter Song-Fortschritt (Tests).
+  final SongProgressStore? songProgress;
+
   @override
   State<SongDetailScreen> createState() => _SongDetailScreenState();
 }
 
 class _SongDetailScreenState extends State<SongDetailScreen> {
   late final PlayAlongController _controller;
+  late final SongProgressStore _songProgress;
   final ScrollController _chordScroll = ScrollController();
   Timer? _ticker;
 
@@ -66,6 +72,7 @@ class _SongDetailScreenState extends State<SongDetailScreen> {
     super.initState();
     _controller = PlayAlongController(song);
     _controller.addListener(_onController);
+    _songProgress = widget.songProgress ?? SongProgressStore();
     _checker = PracticeChecker(mapper: NoteMapper());
     _syncCheckerTarget();
   }
@@ -123,6 +130,7 @@ class _SongDetailScreenState extends State<SongDetailScreen> {
     } else {
       _ensureTicker();
       _controller.play();
+      unawaited(_songProgress.markPlayed(song.id));
     }
   }
 
@@ -153,17 +161,6 @@ class _SongDetailScreenState extends State<SongDetailScreen> {
       return;
     }
 
-    if (kIsWeb) {
-      setState(() {
-        _micStarting = false;
-        _listening = false;
-        _micMessage =
-            'Live-Mikrofon ist im Web-Build eingeschränkt. '
-            'Bitte die native App nutzen.';
-      });
-      return;
-    }
-
     final capture = widget.capture ?? createAudioCapture();
     if (widget.capture == null) _ownedCapture = capture;
 
@@ -179,13 +176,18 @@ class _SongDetailScreenState extends State<SongDetailScreen> {
     final granted = await capture.ensurePermission();
     if (!mounted) return;
     if (!granted) {
-      final permanently = await Permission.microphone.isPermanentlyDenied;
+      final permanently =
+          !kIsWeb && await Permission.microphone.isPermanentlyDenied;
       setState(() {
         _micStarting = false;
         _listening = false;
         _micMessage = permanently
             ? 'Mikrofon dauerhaft verweigert — bitte in den Einstellungen erlauben.'
-            : 'Ohne Mikrofon keine Live-Prüfung. Bitte Zugriff erlauben.';
+            : kIsWeb
+                ? 'Mikrofon-Zugriff wurde blockiert. Bitte in den '
+                    'Browser-Einstellungen für diese Seite erlauben und '
+                    'erneut versuchen.'
+                : 'Ohne Mikrofon keine Live-Prüfung. Bitte Zugriff erlauben.';
       });
       return;
     }
@@ -241,7 +243,7 @@ class _SongDetailScreenState extends State<SongDetailScreen> {
       ),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(20, 8, 20, 32),
+          padding: const EdgeInsets.fromLTRB(24, 8, 24, 32),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [

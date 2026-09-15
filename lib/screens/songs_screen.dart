@@ -25,7 +25,7 @@ class _SongsScreenState extends State<SongsScreen> {
       appBar: AppBar(title: const Text('Songs')),
       body: SafeArea(
         child: ListView(
-          padding: const EdgeInsets.fromLTRB(20, 8, 20, 32),
+          padding: const EdgeInsets.fromLTRB(24, 8, 24, 32),
           children: [
             Text(
               'Bibliothek',
@@ -56,19 +56,35 @@ class _SongsScreenState extends State<SongsScreen> {
               ),
             ),
             const SizedBox(height: 12),
-            for (final song in songs) ...[
-              _SongTile(
-                song: song,
-                onTap: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute<void>(
-                      builder: (_) => SongDetailScreen(song: song),
-                    ),
-                  );
-                },
-              ),
-              const SizedBox(height: 10),
-            ],
+            if (songs.isEmpty)
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 24),
+                child: Text(
+                  _filter == null
+                      ? 'Die Songbibliothek ist noch leer. Bald kommen '
+                          'Übungsstücke und Traditionals dazu.'
+                      : 'In „${_filter!.shortLabel}“ sind gerade keine Songs. '
+                          'Wähle eine andere Kategorie oder „Alle“.',
+                  style: theme.textTheme.bodyLarge?.copyWith(
+                    height: 1.45,
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                ),
+              )
+            else
+              for (final song in songs) ...[
+                _SongTile(
+                  song: song,
+                  onTap: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute<void>(
+                        builder: (_) => SongDetailScreen(song: song),
+                      ),
+                    );
+                  },
+                ),
+                const SizedBox(height: 10),
+              ],
           ],
         ),
       ),
@@ -99,7 +115,10 @@ class _CategoryChips extends StatelessWidget {
         children: [
           for (final (cat, label) in chips) ...[
             FilterChip(
-              label: Text(label),
+              label: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 2),
+                child: Text(label),
+              ),
               selected: selected == cat,
               onSelected: (_) => onSelected(cat),
               showCheckmark: false,
@@ -135,35 +154,38 @@ class _SongTile extends StatelessWidget {
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(12),
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(16, 14, 12, 14),
-          child: Row(
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      song.title,
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.w600,
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(minHeight: 72),
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(16, 14, 12, 14),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        song.title,
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      '${song.category.shortLabel} · ${song.bpm} BPM · '
-                      '${song.source.label}',
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: cs.onSurfaceVariant,
+                      const SizedBox(height: 4),
+                      Text(
+                        '${song.category.shortLabel} · ${song.bpm} BPM · '
+                        '${song.source.label}',
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: cs.onSurfaceVariant,
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 8),
-                    DifficultyMeter(difficulty: song.difficulty),
-                  ],
+                      const SizedBox(height: 8),
+                      DifficultyMeter(difficulty: song.difficulty),
+                    ],
+                  ),
                 ),
-              ),
-              Icon(Icons.chevron_right, color: cs.onSurfaceVariant),
-            ],
+                Icon(Icons.chevron_right, color: cs.onSurfaceVariant),
+              ],
+            ),
           ),
         ),
       ),

@@ -17,6 +17,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Lernen'), findsWidgets);
+    expect(find.text('Dein Fortschritt'), findsOneWidget);
     expect(find.text('Anfänger-Pfad'), findsOneWidget);
 
     await tester.tap(find.text('Stimmen').last);
