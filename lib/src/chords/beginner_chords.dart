@@ -1,3 +1,4 @@
+import '../fretboard/barre.dart';
 import '../fretboard/chord_shape.dart';
 import '../fretboard/finger_position.dart';
 
@@ -113,15 +114,29 @@ abstract final class BeginnerChords {
     ],
   );
 
+  /// Beispiel-Barré (F) für Darstellungstests — nicht im Anfänger-Kernpfad.
+  static const fBarre = ChordShape(
+    id: 'f-barre',
+    name: 'F',
+    mutedStrings: {},
+    displayFrets: 4,
+    barre: Barre(fret: 1, fromString: 1, endString: 6, finger: 1),
+    positions: [
+      FingerPosition(stringNumber: 3, fret: 2, finger: 2),
+      FingerPosition(stringNumber: 5, fret: 3, finger: 3),
+      FingerPosition(stringNumber: 4, fret: 3, finger: 4),
+    ],
+  );
+
   /// Alle Anfänger-Akkorde in sinnvoller Lernreihenfolge.
   static const List<ChordShape> all = [
     em,
+    e,
     am,
+    a,
     c,
     g,
     d,
-    e,
-    a,
     dm,
     e7,
     g7,
@@ -131,6 +146,7 @@ abstract final class BeginnerChords {
     for (final c in all) {
       if (c.id == id) return c;
     }
+    if (fBarre.id == id) return fBarre;
     return null;
   }
 
@@ -140,6 +156,18 @@ abstract final class BeginnerChords {
     for (final m in chord.mutedStrings) {
       if (m < 1 || m > 6) {
         errors.add('${chord.id}: gedämpfte Saite $m ungültig (1–6)');
+      }
+    }
+    if (chord.barre != null) {
+      final b = chord.barre!;
+      if (b.fret < 1 || b.fret > 12) {
+        errors.add('${chord.id}: Barré-Bund ${b.fret} außerhalb 1–12');
+      }
+      if (b.finger < 1 || b.finger > 4) {
+        errors.add('${chord.id}: Barré-Finger ${b.finger} außerhalb 1–4');
+      }
+      if (b.lowString < 1 || b.highString > 6) {
+        errors.add('${chord.id}: Barré-Saiten ungültig');
       }
     }
     for (final p in chord.positions) {
@@ -168,6 +196,9 @@ abstract final class BeginnerChords {
   }
 
   static List<String> validateAll() {
-    return [for (final c in all) ...validate(c)];
+    return [
+      for (final c in all) ...validate(c),
+      ...validate(fBarre),
+    ];
   }
 }

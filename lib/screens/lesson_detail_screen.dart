@@ -4,7 +4,7 @@ import '../src/fretboard/fretboard_widget.dart';
 import '../src/tutorial/lesson.dart';
 import '../src/tutorial/lesson_progress.dart';
 
-/// Detailansicht einer Lektion mit Text, optionalem Griffbrett und Abhaken.
+/// Detailansicht einer Lektion mit Schritten, optionalem Griffbrett und Abhaken.
 class LessonDetailScreen extends StatefulWidget {
   const LessonDetailScreen({
     super.key,
@@ -58,14 +58,33 @@ class _LessonDetailScreenState extends State<LessonDetailScreen> {
           padding: const EdgeInsets.fromLTRB(24, 8, 24, 32),
           children: [
             Text(
-              lesson.body,
+              lesson.summary,
               style: theme.textTheme.bodyLarge?.copyWith(
                 height: 1.5,
                 color: theme.colorScheme.onSurface,
               ),
             ),
+            const SizedBox(height: 24),
+            Text(
+              'Schritte',
+              style: theme.textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(height: 12),
+            for (var i = 0; i < lesson.steps.length; i++) ...[
+              if (i > 0) const SizedBox(height: 10),
+              _StepRow(index: i + 1, text: lesson.steps[i]),
+            ],
             if (lesson.chord != null) ...[
-              const SizedBox(height: 24),
+              const SizedBox(height: 28),
+              Text(
+                'Griffbild',
+                style: theme.textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const SizedBox(height: 12),
               FretboardWidget(
                 chord: lesson.chord!,
                 leftHanded: _leftHanded,
@@ -107,13 +126,53 @@ class _LessonDetailScreenState extends State<LessonDetailScreen> {
               height: 52,
               child: FilledButton.icon(
                 onPressed: _saving ? null : _toggleCompleted,
-                icon: Icon(_completed ? Icons.check_circle : Icons.circle_outlined),
-                label: Text(_completed ? 'Erledigt — zurücknehmen' : 'Lektion abhaken'),
+                icon: Icon(
+                  _completed ? Icons.check_circle : Icons.circle_outlined,
+                ),
+                label: Text(
+                  _completed ? 'Erledigt — zurücknehmen' : 'Lektion abhaken',
+                ),
               ),
             ),
           ],
         ),
       ),
+    );
+  }
+}
+
+class _StepRow extends StatelessWidget {
+  const _StepRow({required this.index, required this.text});
+
+  final int index;
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        CircleAvatar(
+          radius: 14,
+          backgroundColor: theme.colorScheme.primaryContainer,
+          foregroundColor: theme.colorScheme.onPrimaryContainer,
+          child: Text(
+            '$index',
+            style: const TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Text(
+            text,
+            style: theme.textTheme.bodyLarge?.copyWith(height: 1.45),
+          ),
+        ),
+      ],
     );
   }
 }

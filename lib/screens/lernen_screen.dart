@@ -141,7 +141,7 @@ class _LernenScreenState extends State<LernenScreen> {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    'Fingerfarben und Links-/Rechtshänder — zum Ausprobieren.',
+                    'Diagramm oder Griffbrett, Fingerfarben, Links-/Rechtshänder.',
                     style: theme.textTheme.bodyMedium?.copyWith(
                       color: theme.colorScheme.onSurfaceVariant,
                     ),
@@ -161,7 +161,9 @@ class _LernenScreenState extends State<LernenScreen> {
                         ChoiceChip(
                           label: Text(_previewChords[i].name),
                           selected: i == _previewIndex,
-                          onSelected: (_) => setState(() => _previewIndex = i),
+                          onSelected: (_) {
+                            setState(() => _previewIndex = i);
+                          },
                         ),
                     ],
                   ),

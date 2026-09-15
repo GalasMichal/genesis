@@ -1,15 +1,23 @@
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:genesis/app.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+
+  setUp(() {
+    SharedPreferences.setMockInitialValues({});
+  });
+
   testWidgets('App-Shell zeigt Lernen und wechselt zu Stimmen', (
     WidgetTester tester,
   ) async {
     await tester.pumpWidget(const GenesisApp());
+    await tester.pumpAndSettle();
 
     expect(find.text('Lernen'), findsWidgets);
-    expect(find.text('Tutorial-Pfad'), findsOneWidget);
+    expect(find.text('Anfänger-Pfad'), findsOneWidget);
 
     await tester.tap(find.text('Stimmen').last);
     await tester.pumpAndSettle();

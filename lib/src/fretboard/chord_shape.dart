@@ -1,3 +1,4 @@
+import 'barre.dart';
 import 'finger_position.dart';
 
 /// Ein Akkordgriff als Liste von Fingerpositionen plus leere/gedämpfte Saiten.
@@ -8,6 +9,7 @@ class ChordShape {
     required this.positions,
     this.mutedStrings = const {},
     this.displayFrets = 5,
+    this.barre,
   });
 
   final String id;
@@ -20,9 +22,17 @@ class ChordShape {
   /// Wie viele Bünde das Diagramm zeigt (ab Bund 1).
   final int displayFrets;
 
-  /// Saiten ohne Finger und ohne Mute → leere Saite („o“).
+  /// Optionales Barré über mehrere Saiten.
+  final Barre? barre;
+
+  /// Saiten ohne Finger, ohne Barré und ohne Mute → leere Saite („o“).
   Set<int> get openStrings {
     final fretted = {for (final p in positions) p.stringNumber};
+    if (barre != null) {
+      for (var s = barre!.lowString; s <= barre!.highString; s++) {
+        fretted.add(s);
+      }
+    }
     return {
       for (var s = 1; s <= 6; s++)
         if (!fretted.contains(s) && !mutedStrings.contains(s)) s,
@@ -31,8 +41,12 @@ class ChordShape {
 
   /// Höchster Bund im Griff (mindestens 1).
   int get maxFret {
-    if (positions.isEmpty) return 1;
-    return positions.map((p) => p.fret).reduce((a, b) => a > b ? a : b);
+    var max = 1;
+    for (final p in positions) {
+      if (p.fret > max) max = p.fret;
+    }
+    if (barre != null && barre!.fret > max) max = barre!.fret;
+    return max;
   }
 
   ChordShape copyWith({
@@ -41,6 +55,8 @@ class ChordShape {
     List<FingerPosition>? positions,
     Set<int>? mutedStrings,
     int? displayFrets,
+    Barre? barre,
+    bool clearBarre = false,
   }) {
     return ChordShape(
       id: id ?? this.id,
@@ -48,6 +64,7 @@ class ChordShape {
       positions: positions ?? this.positions,
       mutedStrings: mutedStrings ?? this.mutedStrings,
       displayFrets: displayFrets ?? this.displayFrets,
+      barre: clearBarre ? null : (barre ?? this.barre),
     );
   }
 
@@ -56,7 +73,8 @@ class ChordShape {
     if (other is! ChordShape) return false;
     if (other.id != id ||
         other.name != name ||
-        other.displayFrets != displayFrets) {
+        other.displayFrets != displayFrets ||
+        other.barre != barre) {
       return false;
     }
     if (other.positions.length != positions.length) return false;
@@ -74,5 +92,6 @@ class ChordShape {
     Object.hashAll(positions),
     Object.hashAll(mutedStrings),
     displayFrets,
+    barre,
   );
 }

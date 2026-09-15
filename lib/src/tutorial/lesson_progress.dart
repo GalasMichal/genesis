@@ -2,7 +2,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 /// Lokaler Fortschritt für den Tutorial-Pfad.
 class LessonProgressStore {
-  LessonProgressStore({SharedPreferences? prefs}) : _prefs = prefs;
+  LessonProgressStore({this._prefs});
 
   static const _keyPrefix = 'lesson_done_';
 

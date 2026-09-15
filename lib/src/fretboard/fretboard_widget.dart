@@ -3,23 +3,31 @@ import 'package:flutter/material.dart';
 import 'chord_shape.dart';
 import 'finger_colors.dart';
 import 'fretboard_painter.dart';
+import 'fretboard_view_mode.dart';
 
-/// Interaktives Griffbrett: CustomPainter, Links-/Rechtshänder, Griffwechsel-Animation.
+/// Interaktives Griffbrett: CustomPainter, zwei Ansichten, Links-/Rechtshänder,
+/// animierte Griffwechsel.
 class FretboardWidget extends StatefulWidget {
   const FretboardWidget({
     super.key,
     required this.chord,
     this.leftHanded = false,
     this.onLeftHandedChanged,
+    this.viewMode = FretboardViewMode.chordDiagram,
+    this.onViewModeChanged,
     this.showHandednessToggle = true,
-    this.height = 200,
+    this.showViewToggle = true,
+    this.height = 220,
     this.animationDuration = const Duration(milliseconds: 280),
   });
 
   final ChordShape chord;
   final bool leftHanded;
   final ValueChanged<bool>? onLeftHandedChanged;
+  final FretboardViewMode viewMode;
+  final ValueChanged<FretboardViewMode>? onViewModeChanged;
   final bool showHandednessToggle;
+  final bool showViewToggle;
   final double height;
   final Duration animationDuration;
 
@@ -27,28 +35,23 @@ class FretboardWidget extends StatefulWidget {
   State<FretboardWidget> createState() => FretboardWidgetState();
 }
 
-/// State öffentlich für Tests (aktueller Griff / Händigkeit).
-class FretboardWidgetState extends State<FretboardWidget>
-    with SingleTickerProviderStateMixin {
+/// State öffentlich für Tests (aktueller Griff / Händigkeit / Ansicht).
+class FretboardWidgetState extends State<FretboardWidget> {
   late ChordShape _displayedChord;
   late bool _leftHanded;
-  late final AnimationController _fade;
-  late final Animation<double> _opacity;
+  late FretboardViewMode _viewMode;
+  double _dotOpacity = 1;
 
   ChordShape get displayedChord => _displayedChord;
   bool get leftHanded => _leftHanded;
+  FretboardViewMode get viewMode => _viewMode;
 
   @override
   void initState() {
     super.initState();
     _displayedChord = widget.chord;
     _leftHanded = widget.leftHanded;
-    _fade = AnimationController(
-      vsync: this,
-      duration: widget.animationDuration,
-      value: 1,
-    );
-    _opacity = CurvedAnimation(parent: _fade, curve: Curves.easeInOut);
+    _viewMode = widget.viewMode;
   }
 
   @override
@@ -57,19 +60,22 @@ class FretboardWidgetState extends State<FretboardWidget>
     if (oldWidget.leftHanded != widget.leftHanded) {
       _leftHanded = widget.leftHanded;
     }
+    if (oldWidget.viewMode != widget.viewMode) {
+      _viewMode = widget.viewMode;
+    }
     if (oldWidget.chord != widget.chord) {
       _animateTo(widget.chord);
-    }
-    if (oldWidget.animationDuration != widget.animationDuration) {
-      _fade.duration = widget.animationDuration;
     }
   }
 
   Future<void> _animateTo(ChordShape next) async {
-    await _fade.reverse();
+    setState(() => _dotOpacity = 0);
+    await Future<void>.delayed(widget.animationDuration);
     if (!mounted) return;
-    setState(() => _displayedChord = next);
-    await _fade.forward();
+    setState(() {
+      _displayedChord = next;
+      _dotOpacity = 1;
+    });
   }
 
   void _setLeftHanded(bool value) {
@@ -78,10 +84,10 @@ class FretboardWidgetState extends State<FretboardWidget>
     widget.onLeftHandedChanged?.call(value);
   }
 
-  @override
-  void dispose() {
-    _fade.dispose();
-    super.dispose();
+  void _setViewMode(FretboardViewMode mode) {
+    if (_viewMode == mode) return;
+    setState(() => _viewMode = mode);
+    widget.onViewModeChanged?.call(mode);
   }
 
   @override
@@ -91,17 +97,21 @@ class FretboardWidgetState extends State<FretboardWidget>
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        if (widget.showHandednessToggle) ...[
-          Row(
-            children: [
-              Expanded(
+        Row(
+          children: [
+            Expanded(
+              child: AnimatedSwitcher(
+                duration: widget.animationDuration,
                 child: Text(
                   _displayedChord.name,
+                  key: ValueKey(_displayedChord.id),
                   style: theme.textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.w600,
                   ),
                 ),
               ),
+            ),
+            if (widget.showHandednessToggle) ...[
               const SizedBox(width: 8),
               SegmentedButton<bool>(
                 segments: const [
@@ -118,30 +128,54 @@ class FretboardWidgetState extends State<FretboardWidget>
                 ],
                 selected: {_leftHanded},
                 onSelectionChanged: (set) => _setLeftHanded(set.first),
-                style: ButtonStyle(
+                style: const ButtonStyle(
                   visualDensity: VisualDensity.compact,
                   tapTargetSize: MaterialTapTargetSize.padded,
                 ),
               ),
             ],
+          ],
+        ),
+        if (widget.showViewToggle) ...[
+          const SizedBox(height: 10),
+          SegmentedButton<FretboardViewMode>(
+            segments: const [
+              ButtonSegment<FretboardViewMode>(
+                value: FretboardViewMode.chordDiagram,
+                label: Text('Diagramm'),
+                icon: Icon(Icons.view_agenda_outlined, size: 18),
+              ),
+              ButtonSegment<FretboardViewMode>(
+                value: FretboardViewMode.horizontal,
+                label: Text('Griffbrett'),
+                icon: Icon(Icons.horizontal_rule, size: 18),
+              ),
+            ],
+            selected: {_viewMode},
+            onSelectionChanged: (set) => _setViewMode(set.first),
+            style: const ButtonStyle(
+              visualDensity: VisualDensity.compact,
+              tapTargetSize: MaterialTapTargetSize.padded,
+            ),
           ),
-          const SizedBox(height: 8),
         ],
+        const SizedBox(height: 8),
         SizedBox(
           height: widget.height,
           width: double.infinity,
-          child: AnimatedBuilder(
-            animation: _opacity,
-            builder: (context, _) {
-              return CustomPaint(
-                painter: FretboardPainter(
-                  chord: _displayedChord,
-                  leftHanded: _leftHanded,
-                  dotOpacity: _opacity.value,
-                ),
-                child: const SizedBox.expand(),
-              );
-            },
+          child: AnimatedOpacity(
+            opacity: _dotOpacity,
+            duration: widget.animationDuration,
+            curve: Curves.easeInOut,
+            child: CustomPaint(
+              painter: FretboardPainter(
+                chord: _displayedChord,
+                leftHanded: _leftHanded,
+                viewMode: _viewMode,
+                dotOpacity: 1,
+              ),
+              child: const SizedBox.expand(),
+            ),
           ),
         ),
         const SizedBox(height: 8),

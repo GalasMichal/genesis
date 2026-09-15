@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:genesis/src/chords/beginner_chords.dart';
 import 'package:genesis/src/fretboard/fretboard_painter.dart';
+import 'package:genesis/src/fretboard/fretboard_view_mode.dart';
 import 'package:genesis/src/fretboard/fretboard_widget.dart';
 
 void main() {
@@ -11,7 +12,9 @@ void main() {
     await tester.pumpWidget(
       MaterialApp(
         home: Scaffold(
-          body: FretboardWidget(chord: BeginnerChords.em),
+          body: SingleChildScrollView(
+            child: FretboardWidget(chord: BeginnerChords.em),
+          ),
         ),
       ),
     );
@@ -20,14 +23,46 @@ void main() {
     expect(find.text('Em'), findsOneWidget);
     expect(find.byType(CustomPaint), findsWidgets);
 
-    final state = tester.state<FretboardWidgetState>(find.byType(FretboardWidget));
+    final state = tester.state<FretboardWidgetState>(
+      find.byType(FretboardWidget),
+    );
     expect(state.displayedChord.positions, BeginnerChords.em.positions);
     expect(state.displayedChord.positions, isNotEmpty);
     expect(state.leftHanded, isFalse);
+    expect(state.viewMode, FretboardViewMode.chordDiagram);
 
-    // Finger-Nummern in der Legende
     expect(find.text('Zeigefinger'), findsOneWidget);
     expect(find.text('Mittelfinger'), findsOneWidget);
+    expect(find.text('Diagramm'), findsOneWidget);
+    expect(find.text('Griffbrett'), findsOneWidget);
+  });
+
+  testWidgets('Ansicht umschalten: Diagramm ↔ Griffbrett', (
+    WidgetTester tester,
+  ) async {
+    final key = GlobalKey<FretboardWidgetState>();
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: SingleChildScrollView(
+            child: FretboardWidget(
+              key: key,
+              chord: BeginnerChords.am,
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    expect(key.currentState!.viewMode, FretboardViewMode.chordDiagram);
+
+    await tester.tap(find.text('Griffbrett'));
+    await tester.pumpAndSettle();
+    expect(key.currentState!.viewMode, FretboardViewMode.horizontal);
+
+    await tester.tap(find.text('Diagramm'));
+    await tester.pumpAndSettle();
+    expect(key.currentState!.viewMode, FretboardViewMode.chordDiagram);
   });
 
   testWidgets('Links-/Rechtshänder spiegelt Saitenpositionen', (
@@ -37,9 +72,11 @@ void main() {
     await tester.pumpWidget(
       MaterialApp(
         home: Scaffold(
-          body: FretboardWidget(
-            key: key,
-            chord: BeginnerChords.am,
+          body: SingleChildScrollView(
+            child: FretboardWidget(
+              key: key,
+              chord: BeginnerChords.am,
+            ),
           ),
         ),
       ),
@@ -52,12 +89,16 @@ void main() {
     final y6Left = layout.stringY(6, true);
     final y1Left = layout.stringY(1, true);
 
-    // Rechtshänder: tiefe E (6) oben, hohe e (1) unten
     expect(y6Right, lessThan(y1Right));
-    // Linkshänder: gespiegelt
     expect(y6Left, greaterThan(y1Left));
     expect(y6Right, closeTo(y1Left, 0.001));
     expect(y1Right, closeTo(y6Left, 0.001));
+
+    final diagram = ChordDiagramLayout.fromSize(const Size(200, 280), frets: 5);
+    final x6Right = diagram.stringX(6, false);
+    final x1Right = diagram.stringX(1, false);
+    expect(x6Right, lessThan(x1Right));
+    expect(diagram.stringX(6, true), greaterThan(diagram.stringX(1, true)));
 
     expect(key.currentState!.leftHanded, isFalse);
     await tester.tap(find.text('Links'));
@@ -72,23 +113,25 @@ void main() {
   testWidgets('Griffwechsel aktualisiert angezeigten Akkord', (
     WidgetTester tester,
   ) async {
-    ChordShapeHolder holder = ChordShapeHolder(BeginnerChords.em);
+    var chord = BeginnerChords.em;
 
     await tester.pumpWidget(
       MaterialApp(
         home: Scaffold(
           body: StatefulBuilder(
             builder: (context, setState) {
-              return Column(
-                children: [
-                  FretboardWidget(chord: holder.chord),
-                  TextButton(
-                    onPressed: () => setState(() {
-                      holder = ChordShapeHolder(BeginnerChords.am);
-                    }),
-                    child: const Text('Zu Am'),
-                  ),
-                ],
+              return SingleChildScrollView(
+                child: Column(
+                  children: [
+                    FretboardWidget(chord: chord),
+                    TextButton(
+                      onPressed: () => setState(() {
+                        chord = BeginnerChords.am;
+                      }),
+                      child: const Text('Zu Am'),
+                    ),
+                  ],
+                ),
               );
             },
           ),
@@ -102,9 +145,19 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('Am'), findsOneWidget);
   });
-}
 
-class ChordShapeHolder {
-  ChordShapeHolder(this.chord);
-  final dynamic chord;
+  testWidgets('Barré-Akkord rendert ohne Fehler', (WidgetTester tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: SingleChildScrollView(
+            child: FretboardWidget(chord: BeginnerChords.fBarre),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    expect(find.text('F'), findsOneWidget);
+    expect(BeginnerChords.fBarre.barre, isNotNull);
+  });
 }

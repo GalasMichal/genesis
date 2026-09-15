@@ -5,7 +5,8 @@ class Lesson {
   const Lesson({
     required this.id,
     required this.title,
-    required this.body,
+    required this.summary,
+    required this.steps,
     this.chord,
     this.practiceHint,
     this.opensTuner = false,
@@ -14,8 +15,11 @@ class Lesson {
   final String id;
   final String title;
 
-  /// Pädagogischer Erklärtext (Deutsch, Eigencontent).
-  final String body;
+  /// Kurzer Einstiegstext (Deutsch, Eigencontent).
+  final String summary;
+
+  /// Schritt-für-Schritt-Anleitung.
+  final List<String> steps;
 
   /// Optionales Griffbild über das Griffbrett-Widget.
   final ChordShape? chord;
@@ -25,4 +29,7 @@ class Lesson {
 
   /// Wenn true, zeigt die UI einen Sprung zum Stimmen-Tab.
   final bool opensTuner;
+
+  /// Zusammengefügter Fließtext (für Tests / Suche).
+  String get body => '$summary\n\n${steps.map((s) => '• $s').join('\n')}';
 }
