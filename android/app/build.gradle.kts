@@ -6,7 +6,7 @@ plugins {
 
 android {
     namespace = "de.galas.genesis"
-    compileSdk = flutter.compileSdkVersion
+    compileSdk = 37
     ndkVersion = flutter.ndkVersion
 
     compileOptions {

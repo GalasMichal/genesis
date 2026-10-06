@@ -57,6 +57,30 @@ lib/
 
 Lernpfad, Üben, Songs, Stimmen und Technik-Anleitung sind umgesetzt (P0–P6). Kein Store-Release in diesem Repo — Lern-/Demo-Stand.
 
+## Screenshots
+
+| Lernen | Üben |
+|---|---|
+| ![Lernen](docs/screenshots/p5-lernen.png) | ![Üben](docs/screenshots/p5-ueben.png) |
+| **Lektion** | **Stimmen** |
+| ![Lektion](docs/screenshots/p5-lektion.png) | ![Stimmen](docs/screenshots/p5-stimmen.png) |
+| **Songs** | **Play-Along** |
+| ![Songs](docs/screenshots/p5-songs.png) | ![Play-Along](docs/screenshots/p6-playalong.png) |
+| **Schlagtechnik** | **Schlagmuster** |
+| ![Schlagtechnik](docs/screenshots/p6-schlagtechnik.png) | ![Schlagmuster](docs/screenshots/p6-schlagmuster.png) |
+
+Weitere: [`docs/screenshots/`](docs/screenshots/)
+
+## Android-APK
+
+Demo-Build (debug-signiert, kein Play Store):
+
+[docs/release/genesis-gitarre-release.apk](docs/release/genesis-gitarre-release.apk)
+
+```bash
+adb install -r docs/release/genesis-gitarre-release.apk
+```
+
 ## Lizenz
 
 Privat / Portfolio — bei Interesse an Nutzung: [contact@michal-galas.de](mailto:contact@michal-galas.de)
