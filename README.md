@@ -1,26 +1,51 @@
-# genesis — Gitarren-Lern-App
+<p align="center">
+  <img src="docs/screenshots/app-icon.png" width="128" alt="genesis App-Icon">
+</p>
 
-Flutter-App für Anfänger: Lernen, Üben mit Mikrofon-Check, Songs und eingebauter Tuner. Mobile-first, Dark Theme (Material 3).
+<h1 align="center">genesis</h1>
 
-![App-Icon](docs/screenshots/app-icon.png)
+<p align="center">
+  Gitarren-Lern-App für Anfänger — Lektionen, Mic-Check, Songs, Tuner.<br>
+  Flutter, Dark Theme, alles lokal. Kein Account, keine Cloud.
+</p>
 
-## Features
+<p align="center">
+  <a href="docs/release/genesis-gitarre-release.apk"><strong>Android-APK laden</strong></a>
+  ·
+  <a href="mailto:contact@michal-galas.de">contact@michal-galas.de</a>
+</p>
 
-| Bereich | Was drin ist |
+## Screenshots
+
+<p align="center">
+  <img src="docs/assets/readme/lernen.png" width="180" alt="Lernen">
+  <img src="docs/assets/readme/ueben.png" width="180" alt="Üben">
+  <img src="docs/assets/readme/stimmen.png" width="180" alt="Stimmen">
+  <img src="docs/assets/readme/songs.png" width="180" alt="Songs">
+</p>
+
+<p align="center">
+  <img src="docs/assets/readme/lektion.png" width="180" alt="Lektion">
+  <img src="docs/assets/readme/playalong.png" width="180" alt="Play-Along">
+  <img src="docs/assets/readme/schlagtechnik.png" width="180" alt="Schlagtechnik">
+  <img src="docs/assets/readme/schlagmuster.png" width="180" alt="Schlagmuster">
+</p>
+
+| Tab | Inhalt |
 |---|---|
-| **Lernen** | 10 eigene Anfänger-Lektionen, Fortschritt lokal gespeichert |
-| **Üben** | Übungssets mit Live-Mikrofon-Check (Pitch) |
-| **Songs** | Songbibliothek inkl. Play-Along |
-| **Stimmen** | Tuner mit YIN-Pitch-Detector in reinem Dart |
-| **Griffbrett** | Chord-Shapes, Fingerfarben, Links-/Rechtshänder |
-| **Technik** | Schlag- und Zupfmuster mit Validierung |
+| **Lernen** | 10 Anfänger-Lektionen, Fortschritt lokal |
+| **Üben** | Sets mit Live-Mikrofon-Check (Pitch) |
+| **Songs** | Bibliothek inkl. Play-Along |
+| **Stimmen** | Tuner, YIN in reinem Dart |
+
+Griffbrett mit Chord-Shapes, Fingerfarben, Links-/Rechtshänder. Schlag- und Zupfmuster mit Validierung.
 
 ## Stack
 
-- Flutter / Dart (stable)
+- Flutter / Dart
 - `record` + `permission_handler` für Audio
 - `shared_preferences` für Fortschritt
-- Pitch: YIN (de Cheveigné & Kawahara), lokal ohne Cloud
+- Pitch: YIN (de Cheveigné & Kawahara) — lokal, ohne Cloud
 
 ## Start
 
@@ -29,51 +54,15 @@ flutter pub get
 flutter run -d chrome   # oder linux / Gerät
 ```
 
-Checks:
-
 ```bash
 flutter analyze
 flutter test
 flutter build web --release
 ```
 
-## Struktur
-
-```
-lib/
-  main.dart / app.dart / theme.dart
-  screens/          # Lernen, Üben, Songs, Stimmen, …
-  src/
-    pitch/          # YIN-Detector
-    tuner/          # Pipeline, Stimmungen
-    fretboard/      # Widget + Painter
-    practice/       # Sets, Checker, Progress
-    songs/          # Library, Play-Along
-    strumming/      # Schlag-/Zupftechnik
-    tutorial/       # Lektionen
-```
-
-## Status
-
-Lernpfad, Üben, Songs, Stimmen und Technik-Anleitung sind umgesetzt (P0–P6). Kein Store-Release in diesem Repo — Lern-/Demo-Stand.
-
-## Screenshots
-
-| Lernen | Üben |
-|---|---|
-| ![Lernen](docs/screenshots/p5-lernen.png) | ![Üben](docs/screenshots/p5-ueben.png) |
-| **Lektion** | **Stimmen** |
-| ![Lektion](docs/screenshots/p5-lektion.png) | ![Stimmen](docs/screenshots/p5-stimmen.png) |
-| **Songs** | **Play-Along** |
-| ![Songs](docs/screenshots/p5-songs.png) | ![Play-Along](docs/screenshots/p6-playalong.png) |
-| **Schlagtechnik** | **Schlagmuster** |
-| ![Schlagtechnik](docs/screenshots/p6-schlagtechnik.png) | ![Schlagmuster](docs/screenshots/p6-schlagmuster.png) |
-
-Weitere: [`docs/screenshots/`](docs/screenshots/)
-
 ## Android-APK
 
-Demo-Build (debug-signiert, kein Play Store):
+Demo-Build, debug-signiert, kein Play Store:
 
 [docs/release/genesis-gitarre-release.apk](docs/release/genesis-gitarre-release.apk)
 
@@ -81,6 +70,22 @@ Demo-Build (debug-signiert, kein Play Store):
 adb install -r docs/release/genesis-gitarre-release.apk
 ```
 
+## Struktur
+
+```
+lib/
+  screens/     Lernen, Üben, Songs, Stimmen
+  src/pitch/   YIN-Detector
+  src/tuner/   Pipeline, Stimmungen
+  src/fretboard/
+  src/practice/
+  src/songs/
+  src/strumming/
+  src/tutorial/
+```
+
+Lernpfad bis Technik-Anleitung ist drin. Kein Store-Release — Portfolio-/Demo-Stand.
+
 ## Lizenz
 
-Privat / Portfolio — bei Interesse an Nutzung: [contact@michal-galas.de](mailto:contact@michal-galas.de)
+Portfolio. Nutzung: [contact@michal-galas.de](mailto:contact@michal-galas.de)
