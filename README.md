@@ -1,46 +1,35 @@
-# genesis
+# genesis — Gitarren-Lern-App
 
-Gitarren-Lern-App für Anfänger — mobile-first, schlicht und ehrlich.
+Flutter-App für Anfänger: Lernen, Üben mit Mikrofon-Check, Songs und eingebauter Tuner. Mobile-first, Dark Theme (Material 3).
 
-Mit dem Mikrofon prüft die App, ob du richtig spielst. Ein Tutorial-Pfad, ein
-Griffbrett und eine Songbibliothek (eigener und gemeinfreier Content) folgen
-Schritt für Schritt.
+![App-Icon](docs/screenshots/app-icon.png)
 
-Dieses Repo enthält das **P0-Grundgerüst**: Flutter-Projekt mit Bottom
-Navigation (Lernen, Üben, Songs, Stimmen) und Platzhalter-Screens.
+## Features
 
-## Voraussetzung
+| Bereich | Was drin ist |
+|---|---|
+| **Lernen** | 10 eigene Anfänger-Lektionen, Fortschritt lokal gespeichert |
+| **Üben** | Übungssets mit Live-Mikrofon-Check (Pitch) |
+| **Songs** | Songbibliothek inkl. Play-Along |
+| **Stimmen** | Tuner mit YIN-Pitch-Detector in reinem Dart |
+| **Griffbrett** | Chord-Shapes, Fingerfarben, Links-/Rechtshänder |
+| **Technik** | Schlag- und Zupfmuster mit Validierung |
 
-- [Flutter](https://docs.flutter.dev/get-started/install) auf dem **stable**-Kanal
+## Stack
 
-Prüfen:
+- Flutter / Dart (stable)
+- `record` + `permission_handler` für Audio
+- `shared_preferences` für Fortschritt
+- Pitch: YIN (de Cheveigné & Kawahara), lokal ohne Cloud
 
-```bash
-flutter --version
-```
-
-## Lokal starten
-
-Abhängigkeiten holen (einmalig im Projektordner):
+## Start
 
 ```bash
 flutter pub get
+flutter run -d chrome   # oder linux / Gerät
 ```
 
-Im Browser:
-
-```bash
-flutter run -d chrome
-```
-
-Auf einem verbundenen Gerät oder Emulator:
-
-```bash
-flutter devices
-flutter run -d <gerät-id>
-```
-
-## Checks
+Checks:
 
 ```bash
 flutter analyze
@@ -52,8 +41,22 @@ flutter build web --release
 
 ```
 lib/
-  main.dart          # Einstieg
-  app.dart           # Shell + Navigation
-  theme.dart         # Material 3, Dark Theme
-  screens/           # Lernen, Üben, Songs, Stimmen
+  main.dart / app.dart / theme.dart
+  screens/          # Lernen, Üben, Songs, Stimmen, …
+  src/
+    pitch/          # YIN-Detector
+    tuner/          # Pipeline, Stimmungen
+    fretboard/      # Widget + Painter
+    practice/       # Sets, Checker, Progress
+    songs/          # Library, Play-Along
+    strumming/      # Schlag-/Zupftechnik
+    tutorial/       # Lektionen
 ```
+
+## Status
+
+Lernpfad, Üben, Songs, Stimmen und Technik-Anleitung sind umgesetzt (P0–P6). Kein Store-Release in diesem Repo — Lern-/Demo-Stand.
+
+## Lizenz
+
+Privat / Portfolio — bei Interesse an Nutzung: [contact@michal-galas.de](mailto:contact@michal-galas.de)
